@@ -39,9 +39,9 @@ TPAGE_ARGS = --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --d
 	--define collection_credentials_file=$(COLLECTION_CREDENTIALS_FILE)
 
 
-all: bin build-libs
+all: bin build-libs compile-typespec
 
-build-libs:
+build-libs: 
 	$(TPAGE) $(TPAGE_BUILD_ARGS) $(TPAGE_ARGS) AppConfig.pm.tt > lib/Bio/P3/SolrProxy/AppConfig.pm
 
 service: $(SERVICE_MODULE)
@@ -66,8 +66,8 @@ compile-typespec: Makefile
 bin: $(BIN_PERL) $(BIN_SERVICE_PERL)
 
 deploy: deploy-all
-deploy-all: deploy-client 
-deploy-client: deploy-libs deploy-scripts deploy-docs
+deploy-all: deploy-client  deploy-service
+deploy-client: compile-typespec deploy-libs deploy-scripts deploy-docs
 
 deploy-service: deploy-libs deploy-scripts deploy-service-scripts deploy-specs
 
