@@ -198,11 +198,17 @@ sub insert_records
     ref($doc) eq 'ARRAY' or die "Invalid record data format: must be array";
     grep { ref($_) ne 'HASH' } @$doc and die "Invalid record data format: must be array of hashes";
 
-    my $url = solr_url . "/$collection_name/update";
+    my $url = solr_url . "/$collection_name/update?commit=true";
     my $res = $ua->post($url,
 			"Content-Type" => 'application/json',
 			Content => $records);
 
+    if (!$res->is_success)
+    {
+	die "Error processing update: " . $res->content;
+    }
+    my $n = @$doc;
+    print STDERR "$user inserted $n records in $collection_name\n";
     
     #END insert_records
     my @_bad_returns;
@@ -314,7 +320,8 @@ sub update_records
     {
 	die "Error processing update: " . $res->content;
     }
-    print STDERR "Processed update: " . $res->content;
+    my $n = @$doc;
+    print STDERR "$user updated $n records in $collection_name\n";
 
     #END update_records
     my @_bad_returns;
