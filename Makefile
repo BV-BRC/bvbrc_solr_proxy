@@ -10,6 +10,8 @@ SERVICE = SolrProxy
 SERVICE_NAME = $(SERVICE)
 SERVICE_URL = https://p3.theseed.org/services/$(SERVICE)
 SERVICE_MODULE = lib/Bio/P3/SolrProxy/Service.pm
+SERVICE_PORT = 7099
+SERVICE_PSGI_FILE = $(SERVICE_NAME).psgi
 SERVER_SPEC = $(SERVICE).spec
 
 SRC_PERL = $(wildcard scripts/*.pl)
@@ -32,6 +34,7 @@ TPAGE_ARGS = --define kb_top=$(TARGET) --define kb_runtime=$(DEPLOY_RUNTIME) --d
 	--define kb_sphinx_port=$(SPHINX_PORT) --define kb_sphinx_host=$(SPHINX_HOST) \
 	--define kb_starman_workers=$(STARMAN_WORKERS) \
 	--define kb_starman_max_requests=$(STARMAN_MAX_REQUESTS) \
+	--define kb_psgi=$(SERVICE_PSGI_FILE) \
 	--define data_api_url=$(DATA_API_URL) \
 	--define solr_url=$(SOLR_URL) \
 	--define solr_user=$(SOLR_USER) \
@@ -67,9 +70,13 @@ bin: $(BIN_PERL) $(BIN_SERVICE_PERL)
 
 deploy: deploy-all
 deploy-all: deploy-client  deploy-service
-deploy-client: compile-typespec deploy-libs deploy-scripts deploy-docs
+deploy-client: compile-typespec build-libs deploy-libs deploy-scripts deploy-docs
 
-deploy-service: deploy-libs deploy-scripts deploy-service-scripts deploy-specs
+deploy-service: deploy-dir deploy-libs deploy-scripts deploy-service-scripts deploy-specs
+	for script in start_service stop_service ; do \
+		$(TPAGE) $(TPAGE_DEPLOY_ARGS) $(TPAGE_ARGS) service/$$script.tt > $(TARGET)/services/$(SERVICE)/$$script ; \
+		chmod +x $(TARGET)/services/$(SERVICE)/$$script ; \
+	done
 
 deploy-dir:
 	if [ ! -d $(SERVICE_DIR) ] ; then mkdir $(SERVICE_DIR) ; fi
