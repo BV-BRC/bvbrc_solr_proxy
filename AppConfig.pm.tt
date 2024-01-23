@@ -1,0 +1,16 @@
+package Bio::P3::SolrProxy::AppConfig;
+
+use constant        data_api_url   => '[% data_api_url %]';
+use constant        solr_url	   => '[% solr_url %]';
+use constant        solr_user	   => '[% solr_user %]';
+use constant        solr_pass      => '[% solr_pass %]';
+use constant	    collection_credentials_file => '[% collection_credentials_file %]';
+
+use base 'Exporter';
+our @EXPORT_OK = qw(data_api_url 
+		    solr_url solr_user solr_pass
+		    collection_credentials_file
+		    );
+our %EXPORT_TAGS = (all => [@EXPORT_OK]);
+1;
+
